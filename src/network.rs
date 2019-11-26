@@ -14,8 +14,7 @@ pub struct Network {
     pub Attachable: bool,
     pub Ingress: bool,
     pub Options: HashMap<String, String>,
-    pub Labels: Option<HashMap<String, String>>
-    //IPAM
+    pub Labels: Option<HashMap<String, String>>, //IPAM
 }
 
 impl Clone for Network {
@@ -31,7 +30,7 @@ impl Clone for Network {
             Attachable: self.Attachable,
             Ingress: self.Ingress,
             Options: self.Options.clone(),
-            Labels: self.Labels.clone()
+            Labels: self.Labels.clone(),
         }
     }
 }
@@ -53,8 +52,7 @@ pub struct NetworkCreate {
     pub Ingress: Option<bool>,
     pub EnableIPv6: Option<bool>,
     pub Options: Option<HashMap<String, String>>,
-    pub Labels: Option<HashMap<String, String>>
-    //IPAM
+    pub Labels: Option<HashMap<String, String>>, //IPAM
 }
 
 impl Clone for NetworkCreate {
@@ -68,7 +66,7 @@ impl Clone for NetworkCreate {
             Ingress: self.Ingress,
             EnableIPv6: self.EnableIPv6,
             Options: self.Options.clone(),
-            Labels: self.Labels.clone()
+            Labels: self.Labels.clone(),
         }
     }
 }
