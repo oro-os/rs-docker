@@ -2,7 +2,7 @@
 edition = "2018"
 name = "rs-docker"
 description = "Docker Remote API in Rust"
-version = "0.0.58"
+version = "0.0.59"
 authors = ["Thiago Areias <kblo.thiago@gmail.com>"]
 license = "Apache-2.0"
 homepage = "https://gitlab.com/kblobr/rust-docker"
@@ -12,11 +12,10 @@ readme = "README.md"
 keywords = ["docker"]
 
 [dependencies]
-serde = "1.0.100"
-serde_derive = "1.0.100"
-serde_json = "1.0.40"
-hyper = "0.12.34"
-hyperlocal = "0.6.0"
-futures = "0.1.29"
-tokio = "0.1.22"
-tokio-core = "0.1.17"
+serde = "1.0.126"
+serde_derive = "1.0.126"
+serde_json = "1.0.64"
+hyper = "0.14.9"
+hyperlocal = "0.8.0"
+futures = "0.3.15"
+tokio = "1.7.0"

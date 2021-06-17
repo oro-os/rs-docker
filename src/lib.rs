@@ -11,7 +11,6 @@ extern crate serde_json;
 extern crate futures;
 extern crate hyper;
 extern crate hyperlocal;
-extern crate tokio_core;
 
 // declare modules
 pub mod container;
