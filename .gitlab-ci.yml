@@ -2,7 +2,7 @@ image: "rustlang/rust:nightly"
 
 before_script:
 - apt-get update
-- apt-get install -q -y build-essential libssl1.0-dev
+- apt-get install -q -y build-essential libssl-dev
 
 
 test:latest:
