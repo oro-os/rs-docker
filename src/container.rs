@@ -15,7 +15,7 @@ pub struct Container {
     pub SizeRw: Option<u64>, // I guess it is optional on Mac.
     pub SizeRootFs: u64,
     pub Labels: Option<HashMap<String, String>>,
-    pub HostConfig: HostConfig
+    pub HostConfig: HostConfig,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -24,13 +24,13 @@ pub struct Port {
     pub IP: Option<String>,
     pub PrivatePort: u64,
     pub PublicPort: Option<u64>,
-    pub Type: String
+    pub Type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[allow(non_snake_case)]
 pub struct HostConfig {
-    pub NetworkMode: String
+    pub NetworkMode: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -58,7 +58,7 @@ pub struct ContainerInfo {
     pub RestartCount: u64,
     // State
     pub Volumes: HashMap<String, String>,
-    pub VolumesRW: HashMap<String, bool>
+    pub VolumesRW: HashMap<String, bool>,
 }
 
 impl Clone for Container {
@@ -74,9 +74,9 @@ impl Clone for Container {
             SizeRw: self.SizeRw,
             SizeRootFs: self.SizeRootFs,
             Labels: self.Labels.clone(),
-            HostConfig: self.HostConfig.clone()
+            HostConfig: self.HostConfig.clone(),
         };
-        
+
         return container;
     }
 }
@@ -93,7 +93,7 @@ impl std::clone::Clone for Port {
             IP: self.IP.clone(),
             PrivatePort: self.PrivatePort.clone(),
             PublicPort: self.PublicPort.clone(),
-            Type: self.Type.clone()
+            Type: self.Type.clone(),
         };
         return port;
     }
@@ -102,7 +102,7 @@ impl std::clone::Clone for Port {
 impl Clone for HostConfig {
     fn clone(&self) -> Self {
         let host_config = HostConfig {
-            NetworkMode: self.NetworkMode.clone()
+            NetworkMode: self.NetworkMode.clone(),
         };
         return host_config;
     }
@@ -133,7 +133,7 @@ impl Clone for ContainerInfo {
             RestartCount: self.RestartCount,
             // State
             Volumes: self.Volumes.clone(),
-            VolumesRW: self.VolumesRW.clone()
+            VolumesRW: self.VolumesRW.clone(),
         };
         return container_info;
     }
@@ -180,7 +180,7 @@ impl Clone for HostConfigCreate {
         HostConfigCreate {
             NetworkMode: self.NetworkMode.clone(),
             PublishAllPorts: self.PublishAllPorts.clone(),
-            PortBindings: self.PortBindings.clone()
+            PortBindings: self.PortBindings.clone(),
         }
     }
 }
@@ -206,7 +206,7 @@ impl Clone for ContainerCreate {
             Image: self.Image.clone(),
             Labels: self.Labels.clone(),
             ExposedPorts: self.ExposedPorts.clone(),
-            HostConfig: self.HostConfig.clone()
+            HostConfig: self.HostConfig.clone(),
         }
     }
 }

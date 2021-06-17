@@ -19,7 +19,7 @@ pub struct Process {
 #[allow(non_snake_case)]
 pub struct Top {
     pub Titles: Vec<String>,
-    pub Processes: Vec<Vec<String>>
+    pub Processes: Vec<Vec<String>>,
 }
 
 impl Display for Process {
@@ -35,7 +35,7 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -43,15 +43,15 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
-        
+
         match self.vsz.clone() {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -59,7 +59,7 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -67,7 +67,7 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -75,7 +75,7 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -83,7 +83,7 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
@@ -91,13 +91,13 @@ impl Display for Process {
             Some(v) => {
                 s.push_str(",");
                 s.push_str(&*v);
-            },
+            }
             None => {}
         }
 
         s.push_str(",");
         s.push_str(&*self.command.clone());
-        
+
         write!(f, "{}", s)
     }
 }
