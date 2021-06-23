@@ -18,7 +18,7 @@ use hyper::client::HttpConnector;
 
 use hyperlocal::UnixConnector;
 
-use tokio::runtime::Runtime;
+use tokio::runtime::{Handle, Runtime};
 
 pub struct Docker {
     protocol: Protocol,
@@ -89,35 +89,28 @@ impl Docker {
             .method(method)
             .body(Body::from(file))
             .expect("failed to build request");
-        Runtime::new().unwrap().block_on(
-            match self.protocol {
-                Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
-                Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
-            }
-            .and_then(|res| hyper::body::to_bytes(res.into_body()))
-            .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap()),
-        )
+        match Handle::try_current() {
+            Ok(handle) => handle.block_on(
+                match self.protocol {
+                    Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
+                    Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
+                }
+                .and_then(|res| hyper::body::to_bytes(res.into_body()))
+                .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap())
+                ),
+            Err(_) => Runtime::new().unwrap().block_on(
+                match self.protocol {
+                    Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
+                    Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
+                }
+                .and_then(|res| hyper::body::to_bytes(res.into_body()))
+                .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap()),
+            )
+        }
     }
 
     fn request(&self, method: Method, url: &str, body: String) -> String {
-        let req = Request::builder()
-            .uri(match self.protocol {
-                Protocol::UNIX => hyperlocal::Uri::new(self.path.clone(), url).into(),
-                _ => format!("{}{}", self.path, url).parse::<Uri>().unwrap(),
-            })
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .method(method)
-            .body(Body::from(body))
-            .expect("failed to build request");
-        Runtime::new().unwrap().block_on(
-            match self.protocol {
-                Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
-                Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
-            }
-            .and_then(|res| hyper::body::to_bytes(res.into_body()))
-            .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap()),
-        )
+        self.request_file(method, url, body.into_bytes(), "application/json")
     }
 
     //
