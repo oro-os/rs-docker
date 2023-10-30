@@ -1,5 +1,3 @@
-use std;
-
 use crate::container::{Container, ContainerCreate, ContainerInfo};
 use crate::filesystem::FilesystemChange;
 use crate::image::{Image, ImageStatus};
@@ -27,6 +25,7 @@ pub struct Docker {
     hyper_client: Option<Client<HttpConnector, Body>>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Protocol {
     UNIX,
     TCP,
@@ -96,16 +95,22 @@ impl Docker {
                     Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
                 }
                 .and_then(|res| hyper::body::to_bytes(res.into_body()))
-                .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap())
-                ),
+                .map(|body| {
+                    String::from_utf8(body.expect("Body should not have an error").to_vec())
+                        .unwrap()
+                }),
+            ),
             Err(_) => Runtime::new().unwrap().block_on(
                 match self.protocol {
                     Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
                     Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
                 }
                 .and_then(|res| hyper::body::to_bytes(res.into_body()))
-                .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap()),
-            )
+                .map(|body| {
+                    String::from_utf8(body.expect("Body should not have an error").to_vec())
+                        .unwrap()
+                }),
+            ),
         }
     }
 
@@ -277,7 +282,7 @@ impl Docker {
     pub fn get_processes(&mut self, container: &Container) -> std::io::Result<Vec<Process>> {
         let body = self.request(
             Method::GET,
-            &format!("/containers/{}/top", container.Id),
+            &format!("/containers/{}/top", container.id),
             "".to_string(),
         );
 
@@ -290,7 +295,7 @@ impl Docker {
         };
 
         let mut processes: Vec<Process> = Vec::new();
-        let mut process_iter = top.Processes.iter();
+        let mut process_iter = top.processes.iter();
         loop {
             let process = match process_iter.next() {
                 Some(process) => process,
@@ -322,7 +327,7 @@ impl Docker {
                         break;
                     }
                 };
-                let key = &top.Titles[i];
+                let key = &top.titles[i];
                 match key.as_ref() {
                     "USER" => p.user = value.clone(),
                     "PID" => p.pid = value.clone(),
@@ -348,7 +353,7 @@ impl Docker {
     }
 
     pub fn get_stats(&mut self, container: &Container) -> std::io::Result<Stats> {
-        if container.Status.contains("Up") == false {
+        if container.status.contains("Up") == false {
             let err = std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "The container is already stopped.",
@@ -358,7 +363,7 @@ impl Docker {
 
         let body = self.request(
             Method::GET,
-            &format!("/containers/{}/stats", container.Id),
+            &format!("/containers/{}/stats", container.id),
             "".to_string(),
         );
 
@@ -479,7 +484,7 @@ impl Docker {
     pub fn get_container_info(&mut self, container: &Container) -> std::io::Result<ContainerInfo> {
         let body = self.request(
             Method::GET,
-            &format!("/containers/{}/json", container.Id),
+            &format!("/containers/{}/json", container.id),
             "".to_string(),
         );
 
@@ -499,7 +504,7 @@ impl Docker {
     ) -> std::io::Result<Vec<FilesystemChange>> {
         let body = self.request(
             Method::GET,
-            &format!("/containers/{}/changes", container.Id),
+            &format!("/containers/{}/changes", container.id),
             "".to_string(),
         );
 
@@ -516,7 +521,7 @@ impl Docker {
     pub fn export_container(&mut self, container: &Container) -> std::io::Result<String> {
         let body = self.request(
             Method::GET,
-            &format!("/containers/{}/export", container.Id),
+            &format!("/containers/{}/export", container.id),
             "".to_string(),
         );
 

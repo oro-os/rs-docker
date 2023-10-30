@@ -1,5 +1,5 @@
 [package]
-edition = "2018"
+edition = "2021"
 name = "rs-docker"
 description = "Docker Remote API in Rust"
 version = "0.0.60"

@@ -1,6 +1,6 @@
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct FilesystemChange {
-    pub Path: String,
-    pub Kind: u8,
+    pub path: String,
+    pub kind: u8,
 }

@@ -1,40 +1,17 @@
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct Image {
-    pub Created: u64,
-    pub Id: String,
-    pub ParentId: String,
-    pub RepoTags: Vec<String>,
-    pub Size: u64,
-    pub VirtualSize: u64,
+    pub created: u64,
+    pub id: String,
+    pub parent_id: String,
+    pub repo_tags: Vec<String>,
+    pub size: u64,
+    pub virtual_size: u64,
 }
 
-impl Clone for Image {
-    fn clone(&self) -> Self {
-        let image = Image {
-            Created: self.Created,
-            Id: self.Id.clone(),
-            ParentId: self.ParentId.clone(),
-            RepoTags: self.RepoTags.clone(),
-            Size: self.Size,
-            VirtualSize: self.VirtualSize,
-        };
-        return image;
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+// NOTE(qix-): I guess this doesn't need PascalCase?
 pub struct ImageStatus {
     pub status: Option<String>,
     pub error: Option<String>,
-}
-
-impl Clone for ImageStatus {
-    fn clone(&self) -> Self {
-        let image_status = ImageStatus {
-            status: self.status.clone(),
-            error: self.status.clone(),
-        };
-        return image_status;
-    }
 }

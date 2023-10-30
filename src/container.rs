@@ -1,218 +1,87 @@
-use std;
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
-//Labels, HostConfig
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct Container {
-    pub Id: String,
-    pub Image: String,
-    pub Status: String,
-    pub Command: String,
-    pub Created: u64,
-    pub Names: Vec<String>,
-    pub Ports: Vec<Port>,
-    pub SizeRw: Option<u64>, // I guess it is optional on Mac.
-    pub SizeRootFs: u64,
-    pub Labels: Option<HashMap<String, String>>,
-    pub HostConfig: HostConfig,
+    pub id: String,
+    pub image: String,
+    pub status: String,
+    pub command: String,
+    pub created: u64,
+    pub names: Vec<String>,
+    pub ports: Vec<Port>,
+    pub size_rw: Option<u64>, // I guess it is optional on Mac.
+    pub size_root_fs: u64,
+    pub labels: Option<HashMap<String, String>>,
+    pub host_config: HostConfig,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct Port {
-    pub IP: Option<String>,
-    pub PrivatePort: u64,
-    pub PublicPort: Option<u64>,
-    pub Type: String,
+    #[serde(rename = "IP")]
+    pub ip: Option<String>,
+    pub private_port: u64,
+    pub public_port: Option<u64>,
+    #[serde(rename = "Type")]
+    pub ty: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct HostConfig {
-    pub NetworkMode: String,
+    pub network_mode: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct ContainerInfo {
-    pub AppArmorProfile: String,
-    pub Args: Vec<String>,
+    pub app_armor_profile: String,
+    pub args: Vec<String>,
     // Config
-    pub Created: String,
-    pub Driver: String,
-    pub ExecDriver: String,
+    pub created: String,
+    pub driver: String,
+    pub exec_driver: String,
     // ExecIDs
     // HostConfig
-    pub HostnamePath: String,
-    pub HostsPath: String,
-    pub LogPath: String,
-    pub Id: String,
-    pub Image: String,
-    pub MountLabel: String,
-    pub Name: String,
+    pub hostname_path: String,
+    pub hosts_path: String,
+    pub log_path: String,
+    pub id: String,
+    pub image: String,
+    pub mount_label: String,
+    pub name: String,
     // NetworkSettings
-    pub Path: String,
-    pub ProcessLabel: String,
-    pub ResolvConfPath: String,
-    pub RestartCount: u64,
+    pub path: String,
+    pub process_label: String,
+    pub resolv_conf_path: String,
+    pub restart_count: u64,
     // State
-    pub Volumes: HashMap<String, String>,
-    pub VolumesRW: HashMap<String, bool>,
+    pub volumes: HashMap<String, String>,
+    #[serde(rename = "VolumesRW")]
+    pub volumes_rw: HashMap<String, bool>,
 }
 
-impl Clone for Container {
-    fn clone(&self) -> Self {
-        let container = Container {
-            Id: self.Id.clone(),
-            Image: self.Image.clone(),
-            Status: self.Status.clone(),
-            Command: self.Command.clone(),
-            Created: self.Created.clone(),
-            Names: self.Names.clone(),
-            Ports: self.Ports.clone(),
-            SizeRw: self.SizeRw,
-            SizeRootFs: self.SizeRootFs,
-            Labels: self.Labels.clone(),
-            HostConfig: self.HostConfig.clone(),
-        };
-
-        return container;
-    }
-}
-
-impl std::fmt::Display for Container {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{}", self.Id)
-    }
-}
-
-impl std::clone::Clone for Port {
-    fn clone(&self) -> Self {
-        let port = Port {
-            IP: self.IP.clone(),
-            PrivatePort: self.PrivatePort.clone(),
-            PublicPort: self.PublicPort.clone(),
-            Type: self.Type.clone(),
-        };
-        return port;
-    }
-}
-
-impl Clone for HostConfig {
-    fn clone(&self) -> Self {
-        let host_config = HostConfig {
-            NetworkMode: self.NetworkMode.clone(),
-        };
-        return host_config;
-    }
-}
-
-impl Clone for ContainerInfo {
-    fn clone(&self) -> Self {
-        let container_info = ContainerInfo {
-            AppArmorProfile: self.AppArmorProfile.clone(),
-            Args: self.Args.clone(),
-            // Config
-            Created: self.Created.clone(),
-            Driver: self.Driver.clone(),
-            ExecDriver: self.ExecDriver.clone(),
-            // ExecIDs
-            // HostConfig
-            HostnamePath: self.HostnamePath.clone(),
-            HostsPath: self.HostsPath.clone(),
-            LogPath: self.LogPath.clone(),
-            Id: self.Id.clone(),
-            Image: self.Image.clone(),
-            MountLabel: self.MountLabel.clone(),
-            Name: self.Name.clone(),
-            // NetworkSettings
-            Path: self.Path.clone(),
-            ProcessLabel: self.ProcessLabel.clone(),
-            ResolvConfPath: self.ResolvConfPath.clone(),
-            RestartCount: self.RestartCount,
-            // State
-            Volumes: self.Volumes.clone(),
-            VolumesRW: self.VolumesRW.clone(),
-        };
-        return container_info;
-    }
-}
-
-impl std::fmt::Display for ContainerInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{}", self.Id)
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct PortBinding {
-    pub HostIp: Option<String>,
-    pub HostPort: String,
+    pub host_ip: Option<String>,
+    pub host_port: String,
 }
 
-impl Clone for PortBinding {
-    fn clone(&self) -> Self {
-        PortBinding {
-            HostIp: self.HostIp.clone(),
-            HostPort: self.HostPort.clone(),
-        }
-    }
-}
-
-impl std::fmt::Display for PortBinding {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{}", self.HostPort)
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct HostConfigCreate {
-    pub NetworkMode: Option<String>,
-    pub PublishAllPorts: Option<bool>,
-    pub PortBindings: Option<HashMap<String, Vec<PortBinding>>>,
+    pub network_mode: Option<String>,
+    pub publish_all_ports: Option<bool>,
+    pub port_bindings: Option<HashMap<String, Vec<PortBinding>>>,
 }
 
-impl Clone for HostConfigCreate {
-    fn clone(&self) -> Self {
-        HostConfigCreate {
-            NetworkMode: self.NetworkMode.clone(),
-            PublishAllPorts: self.PublishAllPorts.clone(),
-            PortBindings: self.PortBindings.clone(),
-        }
-    }
-}
-
-impl std::fmt::Display for HostConfigCreate {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{:#?}", self.NetworkMode)
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "PascalCase")]
 pub struct ContainerCreate {
-    pub Image: String,
-    pub Labels: Option<HashMap<String, String>>,
-    pub ExposedPorts: Option<HashMap<String, HashMap<i32, i32>>>,
-    pub HostConfig: Option<HostConfigCreate>,
-}
-
-impl Clone for ContainerCreate {
-    fn clone(&self) -> Self {
-        ContainerCreate {
-            Image: self.Image.clone(),
-            Labels: self.Labels.clone(),
-            ExposedPorts: self.ExposedPorts.clone(),
-            HostConfig: self.HostConfig.clone(),
-        }
-    }
-}
-
-impl std::fmt::Display for ContainerCreate {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{}", self.Image)
-    }
+    pub image: String,
+    pub labels: Option<HashMap<String, String>>,
+    pub exposed_ports: Option<HashMap<String, HashMap<i32, i32>>>,
+    pub host_config: Option<HostConfigCreate>,
 }
