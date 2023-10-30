@@ -27,8 +27,8 @@ pub struct Docker {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Protocol {
-    UNIX,
-    TCP,
+    Unix,
+    Tcp,
 }
 
 impl Docker {
@@ -44,8 +44,8 @@ impl Docker {
         let path = components[1].to_string();
 
         let protocol = match protocol {
-            "unix" => Protocol::UNIX,
-            "tcp" => Protocol::TCP,
+            "unix" => Protocol::Unix,
+            "tcp" => Protocol::Tcp,
             _ => {
                 let err = std::io::Error::new(
                     std::io::ErrorKind::InvalidInput,
@@ -56,7 +56,7 @@ impl Docker {
         };
 
         let hyperlocal_client = match protocol {
-            Protocol::UNIX => {
+            Protocol::Unix => {
                 let unix_connector = UnixConnector;
                 Some(Client::builder().build(unix_connector))
             }
@@ -64,23 +64,23 @@ impl Docker {
         };
 
         let hyper_client = match protocol {
-            Protocol::TCP => Some(Client::new()),
+            Protocol::Tcp => Some(Client::new()),
             _ => None,
         };
 
         let docker = Docker {
-            protocol: protocol,
-            path: path,
-            hyperlocal_client: hyperlocal_client,
-            hyper_client: hyper_client,
+            protocol,
+            path,
+            hyperlocal_client,
+            hyper_client,
         };
-        return Ok(docker);
+        Ok(docker)
     }
 
     fn request_file(&self, method: Method, url: &str, file: Vec<u8>, content_type: &str) -> String {
         let req = Request::builder()
             .uri(match self.protocol {
-                Protocol::UNIX => hyperlocal::Uri::new(self.path.clone(), url).into(),
+                Protocol::Unix => hyperlocal::Uri::new(self.path.clone(), url).into(),
                 _ => format!("{}{}", self.path, url).parse::<Uri>().unwrap(),
             })
             .header("Content-Type", content_type)
@@ -91,8 +91,8 @@ impl Docker {
         match Handle::try_current() {
             Ok(handle) => handle.block_on(
                 match self.protocol {
-                    Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
-                    Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
+                    Protocol::Unix => self.hyperlocal_client.as_ref().unwrap().request(req),
+                    Protocol::Tcp => self.hyper_client.as_ref().unwrap().request(req),
                 }
                 .and_then(|res| hyper::body::to_bytes(res.into_body()))
                 .map(|body| {
@@ -102,8 +102,8 @@ impl Docker {
             ),
             Err(_) => Runtime::new().unwrap().block_on(
                 match self.protocol {
-                    Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
-                    Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
+                    Protocol::Unix => self.hyperlocal_client.as_ref().unwrap().request(req),
+                    Protocol::Tcp => self.hyper_client.as_ref().unwrap().request(req),
                 }
                 .and_then(|res| hyper::body::to_bytes(res.into_body()))
                 .map(|body| {
@@ -276,7 +276,7 @@ impl Docker {
             }
         };
 
-        return Ok(containers);
+        Ok(containers)
     }
 
     pub fn get_processes(&mut self, container: &Container) -> std::io::Result<Vec<Process>> {
@@ -295,15 +295,9 @@ impl Docker {
         };
 
         let mut processes: Vec<Process> = Vec::new();
-        let mut process_iter = top.processes.iter();
-        loop {
-            let process = match process_iter.next() {
-                Some(process) => process,
-                None => {
-                    break;
-                }
-            };
+        let process_iter = top.processes.iter();
 
+        for process in process_iter {
             let mut p = Process {
                 user: String::new(),
                 pid: String::new(),
@@ -318,15 +312,8 @@ impl Docker {
                 command: String::new(),
             };
 
-            let mut value_iter = process.iter();
-            let mut i: usize = 0;
-            loop {
-                let value = match value_iter.next() {
-                    Some(value) => value,
-                    None => {
-                        break;
-                    }
-                };
+            let value_iter = process.iter();
+            for (i, value) in value_iter.enumerate() {
                 let key = &top.titles[i];
                 match key.as_ref() {
                     "USER" => p.user = value.clone(),
@@ -342,18 +329,16 @@ impl Docker {
                     "COMMAND" => p.command = value.clone(),
                     _ => {}
                 }
-
-                i = i + 1;
             }
 
             processes.push(p);
         }
 
-        return Ok(processes);
+        Ok(processes)
     }
 
     pub fn get_stats(&mut self, container: &Container) -> std::io::Result<Stats> {
-        if container.status.contains("Up") == false {
+        if !container.status.contains("Up") {
             let err = std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "The container is already stopped.",
@@ -374,7 +359,7 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(stats);
+        Ok(stats)
     }
 
     //
@@ -444,7 +429,8 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(statuses);
+
+        Ok(statuses)
     }
 
     pub fn get_images(&mut self, all: bool) -> std::io::Result<Vec<Image>> {
@@ -465,7 +451,7 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(images);
+        Ok(images)
     }
 
     pub fn get_system_info(&mut self) -> std::io::Result<SystemInfo> {
@@ -478,7 +464,7 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(info);
+        Ok(info)
     }
 
     pub fn get_container_info(&mut self, container: &Container) -> std::io::Result<ContainerInfo> {
@@ -495,7 +481,7 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(container_info);
+        Ok(container_info)
     }
 
     pub fn get_filesystem_changes(
@@ -515,7 +501,7 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(filesystem_changes);
+        Ok(filesystem_changes)
     }
 
     pub fn export_container(&mut self, container: &Container) -> std::io::Result<String> {
@@ -525,13 +511,13 @@ impl Docker {
             "".to_string(),
         );
 
-        return Ok(body);
+        Ok(body)
     }
 
     pub fn ping(&mut self) -> std::io::Result<String> {
         let body = self.request(Method::GET, "/_ping", "".to_string());
 
-        return Ok(body);
+        Ok(body)
     }
 
     pub fn get_version(&mut self) -> std::io::Result<Version> {
@@ -544,6 +530,6 @@ impl Docker {
                 return Err(err);
             }
         };
-        return Ok(version);
+        Ok(version)
     }
 }
