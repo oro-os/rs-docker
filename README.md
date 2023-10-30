@@ -1,4 +1,5 @@
-# This is a fork
+> **NOTE:** This is a fork-of-a-fork. The `kblobr` fork is missing several features and has some
+> unconventional naming patterns that are fixed in this fork. Below is the original fork advisory.
 
 This crate and repo were forked from [https://github.com/ghmlee/rust-docker](https://github.com/ghmlee/rust-docker) because the original repo seems to no longer be maintained.
 
